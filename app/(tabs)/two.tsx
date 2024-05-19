@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, Text, ScrollView, TouchableOpacity, View, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import axios from 'axios';
 
 //  Configuration for the charts
 const chartConfig = {
@@ -17,7 +18,33 @@ const chartConfig = {
 
 const screenWidth = Dimensions.get('window').width;
 
+interface SensorData {
+  PH: string;
+  Light: string;
+  EC: string;
+  FlowRate: string;
+  Humidity: string;
+  Temperature: string;
+}
+
 export default function TabTwoScreen() {
+  const [data, setData] = useState<SensorData | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://192.168.8.14/ec');
+        setData(response.data); // Directly setting the data
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  
+  
+  
   const [selectedComponent, setSelectedComponent] = useState("EC");
   // const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF']; // Array of colors
   const colors = [
@@ -88,18 +115,24 @@ export default function TabTwoScreen() {
     setSelectedComponent(component);
   };
 
-  const SelectedCard = (name: string, value: number) => (
-    <View style={styles.selectedCard}>
-      <View style={styles.cardLeft}>
-        <Text style={styles.cardValue}>{value}</Text>
-        <Text style={styles.cardValue}> {name}</Text>
-      </View>
-      <View style={styles.cardRight}>
-        <TouchableOpacity><Text style={styles.icon}>▲</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.icon}>▼</Text></TouchableOpacity>
-      </View>
-    </View>
-  );
+  const SelectedCard = (name: string, value: string|undefined) => {
+    if (data) {
+      return (
+        <View style={styles.selectedCard}>
+          <View style={styles.cardLeft}>
+            <Text style={styles.cardValue}>{value}</Text>
+            <Text style={styles.cardValue}> {name}</Text>
+          </View>
+          <View style={styles.cardRight}>
+            <TouchableOpacity><Text style={styles.icon}>▲</Text></TouchableOpacity>
+            <TouchableOpacity><Text style={styles.icon}>▼</Text></TouchableOpacity>
+          </View>
+        </View>
+      );
+    } else {
+      return null;
+    }
+  };
 
   const renderLineChart = (data: { labels: string[]; values: number[][] }, title: string) => {
     return (
@@ -153,7 +186,7 @@ export default function TabTwoScreen() {
         {
           selectedComponent === "EC" ? (
             <>
-              {SelectedCard("EC", 1.4)}
+              {SelectedCard("EC",  data?.EC)}
               <Text style={styles.shortDescription}>The Nutrient Levels are good! The ideal nutrient level for plants is 2.1</Text>
               {renderLineChart(eCData, "Nutrient Levels")}
               <View style={styles.highlightItem}>
@@ -166,7 +199,7 @@ export default function TabTwoScreen() {
 
           ) : selectedComponent === "PH" ? (
             <>
-              {SelectedCard("PH", 6.4)}
+              {SelectedCard("PH", data?.PH)}
               <Text style={styles.shortDescription}>The pH Levels are good! The ideal pH level for plants is 7</Text>
               {renderLineChart(pHData, "Ph Level")}
               <View style={styles.highlightItem}>
@@ -178,7 +211,7 @@ export default function TabTwoScreen() {
             </>
           ) : selectedComponent === "Temp" ? (
             <>
-              {SelectedCard("Celsius", 22)}
+              {SelectedCard("Celsius", data?.Temperature)}
               <Text style={styles.shortDescription}>The temperature is good! The ideal pH level for plants is 20 degrees celsius.</Text>
               {renderLineChart(tempData, "Temperature")}
               <View style={styles.highlightItem}>
@@ -190,7 +223,7 @@ export default function TabTwoScreen() {
             </>
           ) : selectedComponent === "Water" ? (
             <>
-              {SelectedCard("Litters", 2.7)}
+              {SelectedCard("Litters", data?.FlowRate)}
               <Text style={styles.shortDescription}>The water level is too low! The ideal water level is 5 Litters.</Text>
               {renderLineChart(waterLevel, "Water Level")}
               <View style={styles.highlightItem}>
@@ -202,7 +235,7 @@ export default function TabTwoScreen() {
             </>
           ) : selectedComponent === "Humidity" ? (
             <>
-              {SelectedCard("%", 36)}
+              {SelectedCard("%", data?.Humidity)}
               <Text style={styles.shortDescription}>The humidity is low! The ideal humidity is 67%.</Text>
               {renderLineChart(humidityLevel, "Humidity")}
               <View style={styles.highlightItem}>

@@ -30,17 +30,30 @@ interface SensorData {
 export default function TabTwoScreen() {
   const [data, setData] = useState<SensorData | null>(null);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get('http://192.168.8.14/ec');
+  //       setData(response.data); // Directly setting the data
+  //     } catch (error) {
+  //       console.error('Error fetching data: ', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const intervalId = setInterval(async () => {
       try {
         const response = await axios.get('http://192.168.8.14/ec');
-        setData(response.data); // Directly setting the data
+        setData(response.data);
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
-    };
+    }, 10000); // Fetches data every 10 seconds
 
-    fetchData();
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
   
   

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, ScrollView, TouchableOpacity, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, ScrollView, TouchableOpacity, View, Dimensions, ActivityIndicator } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
 
@@ -116,22 +116,22 @@ export default function TabTwoScreen() {
   };
 
   const SelectedCard = (name: string, value: string|undefined) => {
-    if (data) {
-      return (
-        <View style={styles.selectedCard}>
-          <View style={styles.cardLeft}>
-            <Text style={styles.cardValue}>{value}</Text>
-            <Text style={styles.cardValue}> {name}</Text>
-          </View>
-          <View style={styles.cardRight}>
-            <TouchableOpacity><Text style={styles.icon}>▲</Text></TouchableOpacity>
-            <TouchableOpacity><Text style={styles.icon}>▼</Text></TouchableOpacity>
-          </View>
+    if (!data) {
+      return <ActivityIndicator />
+    } 
+
+    return (
+      <View style={styles.selectedCard}>
+        <View style={styles.cardLeft}>
+          <Text style={styles.cardValue}>{value}</Text>
+          <Text style={styles.cardValue}> {name}</Text>
         </View>
-      );
-    } else {
-      return null;
-    }
+        <View style={styles.cardRight}>
+          <TouchableOpacity><Text style={styles.icon}>▲</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.icon}>▼</Text></TouchableOpacity>
+        </View>
+      </View>
+    );
   };
 
   const renderLineChart = (data: { labels: string[]; values: number[][] }, title: string) => {

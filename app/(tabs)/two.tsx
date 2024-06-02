@@ -43,10 +43,13 @@ export default function TabTwoScreen() {
   //   fetchData();
   // }, []);
 
+  const BASE_URL = "http://192.168.8.14/";
+  
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        const response = await axios.get('http://192.168.8.14/ec');
+        const response = await axios.get(BASE_URL);
+        console.log(response)
         setData(response.data);
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -55,9 +58,43 @@ export default function TabTwoScreen() {
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
-  
-  
-  
+
+  const toggleLight = async () => {
+    try {
+      await axios.get(`${BASE_URL}light`);
+      console.log('Light toggled');
+    } catch (error) {
+      console.error('Failed to toggle light', error);
+    }
+  };
+
+  const toggleExtractor = async () => {
+    try {
+      await axios.get(`${BASE_URL}extract`);
+      console.log('Extractor toggled');
+    } catch (error) {
+      console.error('Failed to toggle extractor', error);
+    }
+  };
+
+  const toggleFan = async () => {
+    try {
+      await axios.get(`${BASE_URL}fan`);
+      console.log('Fan toggled');
+    } catch (error) {
+      console.error('Failed to toggle fan', error);
+    }
+  };
+
+  const togglePump = async () => {
+    try {
+      await axios.get(`${BASE_URL}pump`);
+      console.log('Pump toggled');
+    } catch (error) {
+      console.error('Failed to toggle pump', error);
+    }
+  };
+
   const [selectedComponent, setSelectedComponent] = useState("EC");
   // const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF']; // Array of colors
   const colors = [
@@ -128,10 +165,10 @@ export default function TabTwoScreen() {
     setSelectedComponent(component);
   };
 
-  const SelectedCard = (name: string, value: string|undefined) => {
+  const SelectedCard = (name: string, value: string | undefined) => {
     if (!data) {
       return <ActivityIndicator />
-    } 
+    }
 
     return (
       <View style={styles.selectedCard}>
@@ -199,7 +236,7 @@ export default function TabTwoScreen() {
         {
           selectedComponent === "EC" ? (
             <>
-              {SelectedCard("EC",  data?.EC)}
+              {SelectedCard("EC", data?.EC)}
               <Text style={styles.shortDescription}>The Nutrient Levels are good! The ideal nutrient level for plants is 2.1</Text>
               {renderLineChart(eCData, "Nutrient Levels")}
               <View style={styles.highlightItem}>

@@ -32,7 +32,7 @@ export default function TabLayout() {
           title: 'Systems Status',
           tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/Info" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome

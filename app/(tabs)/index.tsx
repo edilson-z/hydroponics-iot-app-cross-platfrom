@@ -1,25 +1,19 @@
-import { ScrollView, StyleSheet, Image, FlatList } from 'react-native';
+import { ScrollView, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
+import axios from 'axios';
 import { Text, View } from '@/components/Themed';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLightbulb, faThermometerHalf, faWater, faFan, faLeaf } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
 
 interface System {
   name: string;
   status: string;
+  getFunction: Function;
 }
 
-const systemsData: System[] = [
-  { name: 'Light', status: 'running' },
-  { name: 'Cooling Fan', status: 'stopped' },
-  { name: 'pH Sensor', status: 'running' },
-  { name: 'EC Sensor', status: 'running' },
-  { name: 'Water Level Sensor', status: 'running' },
-  { name: 'Extractor Fan', status: 'running' },
-  { name: 'Humidifier', status: 'running' },
-]
 
-const SystemItem = ({ name, status }: System) => {
+const SystemItem = ({ name, status, getFunction }: System) => {
   // Define a mapping from system names to icons
   const systemIcons: { [key: string]: IconDefinition } = {
     'Light': faLightbulb,
@@ -34,17 +28,111 @@ const SystemItem = ({ name, status }: System) => {
   const icon = systemIcons[name] as IconDefinition;
 
   return (
-    <View style={[styles.systemItem, status === 'running' ? styles.running : styles.stopped]}>
-      <FontAwesomeIcon icon={icon} size={24} color="#fff" />
-      <Text style={styles.systemText}> {name}</Text>
-      <Text style={styles.statusText}>{status}</Text>
-    </View>
+    <TouchableOpacity onPress={() => getFunction()}>
+      <View style={[styles.systemItem, status === 'running' ? styles.running : styles.stopped]}>
+        <FontAwesomeIcon icon={icon} size={24} color="#fff" />
+        <Text style={styles.systemText}> {name}</Text>
+        <Text style={styles.statusText}>{status}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
 };
 
 export default function TabOneScreen() {
+
+  const BASE_URL = "http://192.168.8.14/";
+
+  
+
+
+  const toggleLight = async () => {
+    console.log("Light toggled")
+    try {
+      await axios.get(`${BASE_URL}light`);
+      console.log('Light toggled');
+      updateSystemStatus('Light');
+
+    } catch (error) {
+      console.error('Failed to toggle light', error);
+    }
+  };
+
+  const toggleExtractor = async () => {
+    console.log("Extractor toggled")
+    try {
+      await axios.get(`${BASE_URL}extract`);
+      console.log('Extractor toggled');
+      updateSystemStatus('Extractor Fan');
+
+    } catch (error) {
+      console.error('Failed to toggle extractor', error);
+    }
+  };
+
+  const toggleFan = async () => {
+    console.log("Fan toggled")
+    try {
+      await axios.get(`${BASE_URL}fan`);
+      console.log('Fan toggled');
+      updateSystemStatus('Cooling Fan');
+
+
+      console.log(systemsData[1].status)
+      if (systemsData[1].status == "stopped") {
+        systemsData[1].status = "running"
+      } else if (systemsData[1].status = "running") {
+        systemsData[1].status = "stopped"
+      }
+
+
+    } catch (error) {
+      console.error('Failed to toggle fan', error);
+    }
+  };
+
+  const togglePump = async () => {
+    try {
+      await axios.get(`${BASE_URL}pump`);
+      console.log('Pump toggled');
+    } catch (error) {
+      console.error('Failed to toggle pump', error);
+    }
+  };
+
+  // let systemsData: System[] = [
+  //   { name: 'Light', status: 'running', getFunction: toggleLight },
+  //   { name: 'Cooling Fan', status: 'stopped', getFunction: toggleFan },
+  //   { name: 'pH Sensor', status: 'running', getFunction: () => { } },
+  //   { name: 'EC Sensor', status: 'running', getFunction: () => { } },
+  //   { name: 'Water Level Sensor', status: 'running', getFunction: () => { } },
+  //   { name: 'Extractor Fan', status: 'stopped', getFunction: toggleExtractor },
+  //   { name: 'Humidifier', status: 'stopped', getFunction: () => { } },
+  // ]
+
+  // Convert systemsData into a state variable
+  const [systemsData, setSystemsData] = useState<System[]>([
+    { name: 'Light', status: 'running', getFunction: toggleLight },
+    { name: 'Cooling Fan', status: 'stopped', getFunction: toggleFan },
+    { name: 'pH Sensor', status: 'running', getFunction: () => { } },
+    { name: 'EC Sensor', status: 'running', getFunction: () => { } },
+    { name: 'Water Level Sensor', status: 'stopped', getFunction: () => { } },
+    { name: 'Extractor Fan', status: 'stopped', getFunction: toggleExtractor },
+    { name: 'Humidifier', status: 'stopped', getFunction: () => { } },
+  ]);
+
+  // Function to update the status of a system
+  const updateSystemStatus = (name: string) => {
+    setSystemsData(prevState =>
+      prevState.map(system =>
+        system.name === name? {...system, status: system.status === 'running'? 'stopped' : 'running' } : system
+      )
+    );
+  };
+
   const sortedSystems = [...systemsData].sort((a, b) => (a.status === 'stopped' ? -1 : 1));
+
+  console.log(sortedSystems)
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

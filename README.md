@@ -4,4 +4,8 @@ This project is a cross-platform IoT application built with React Native and Exp
 
 ## Technologies 
 
+- Java
+- TypeScript
+- React Native
+- Expo
 

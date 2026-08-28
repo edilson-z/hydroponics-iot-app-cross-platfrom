@@ -1,6 +1,6 @@
-# Hydroponics Manager App (React Native & Expo)
+# Cross-Platform Hydroponics Tent App
 
-This project is a cross-platform IoT application built with React Native and Expo for managing a hydroponics system connected via IoT.
+This project presents a cross-platform mobile application for an Artificial Intelligence (AI) and Internet of Things (IoT) enabled hydroponic grow tent that implements the Nutrient Film Technique (NFT) for leafy green plant production. 
 
 ## 💻 Technologies 
 

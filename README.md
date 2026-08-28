@@ -8,5 +8,14 @@ This project presents a cross-platform mobile application for an Artificial Inte
 - `React Native`
 - `Expo`
 
+## 🎯 Features
+- Light control
+- Humidifier control
+- Extractor fan control
+- Cooling fan control
+- pH sensor control
+- EC control
+- Water level sensor control
+- Temperature, water level, humidity, pH Level, and  EC readings
 
 
